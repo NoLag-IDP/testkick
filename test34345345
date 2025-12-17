@@ -1,0 +1,157 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- SCRIPT LOADER GUI
+local scriptLoaderGui = Instance.new("ScreenGui")
+scriptLoaderGui.Name = "ScriptLoader"
+scriptLoaderGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+scriptLoaderGui.Parent = playerGui
+
+local loaderFrame = Instance.new("Frame")
+loaderFrame.Size = UDim2.new(0, 220, 0, 170)
+loaderFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
+loaderFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+loaderFrame.BorderSizePixel = 0
+loaderFrame.Parent = scriptLoaderGui
+Instance.new("UICorner", loaderFrame).CornerRadius = UDim.new(0, 10)
+
+-- White outline
+local outline = Instance.new("UIStroke")
+outline.Thickness = 1
+outline.Color = Color3.fromRGB(255, 255, 255)
+outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+outline.Parent = loaderFrame
+
+-- Title bar
+local loaderTitle = Instance.new("TextLabel", loaderFrame)
+loaderTitle.Size = UDim2.new(1, -40, 0, 30)
+loaderTitle.Position = UDim2.new(0, 10, 0, 0)
+loaderTitle.BackgroundTransparency = 1
+loaderTitle.Text = "Script Loader"
+loaderTitle.Font = Enum.Font.FredokaOne
+loaderTitle.TextSize = 18
+loaderTitle.TextColor3 = Color3.new(1, 1, 1)
+loaderTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Minimize button
+local minimizeButton = Instance.new("TextButton", loaderFrame)
+minimizeButton.Size = UDim2.new(0, 20, 0, 20)
+minimizeButton.Position = UDim2.new(1, -25, 0, 5)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.TextSize = 18
+minimizeButton.Font = Enum.Font.FredokaOne
+Instance.new("UICorner", minimizeButton).CornerRadius = UDim.new(0, 6)
+
+-- Function to create buttons
+local function createScriptButton(text, position, onClick)
+	local btn = Instance.new("TextButton", loaderFrame)
+	btn.Size = UDim2.new(1, -20, 0, 30)
+	btn.Position = position
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.BorderSizePixel = 0
+	btn.Text = text
+	btn.Font = Enum.Font.FredokaOne
+	btn.TextSize = 15
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+	btn.MouseButton1Click:Connect(onClick)
+	return btn
+end
+
+-- Script Frames
+local adminPanelScript = nil
+local dupeBrainrotsScript = nil
+local brainrotSpawnerScript = nil -- updated variable name
+
+-- Buttons
+local btn1 = createScriptButton("Admin Panel", UDim2.new(0, 10, 0, 40), function()
+	if not adminPanelScript then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/NoLag-IDP/conchadmin/refs/heads/main/adminconchreal"))()
+	else
+		adminPanelScript.Enabled = not adminPanelScript.Enabled
+	end
+end)
+
+local btn2 = createScriptButton("Dupe Brainrots", UDim2.new(0, 10, 0, 80), function()
+	if not dupeBrainrotsScript then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/NoLag-IDP/dupe/refs/heads/main/fakedupe2"))()
+	else
+		dupeBrainrotsScript.Enabled = not dupeBrainrotsScript.Enabled
+	end
+end)
+
+-- 🔥 Updated third button → Brainrot Spawner
+local btn3 = createScriptButton("Brainrot Spawner", UDim2.new(0, 10, 0, 120), function()
+	if not brainrotSpawnerScript then
+		brainrotSpawnerScript = loadstring(game:HttpGet("https://raw.githubusercontent.com/NoLag-IDP/testingadminnew/refs/heads/main/test2"))()
+	else
+		brainrotSpawnerScript.Enabled = not brainrotSpawnerScript.Enabled
+	end
+end)
+
+-- NEW: Lucky Block Randomizer button
+local btn4 = createScriptButton("Lucky Block Randomizer", UDim2.new(0, 10, 0, 160), function()
+	loadstring(game:HttpGet("https://github.com/NoLag-IDP/randomizer/blob/main/lb"))()
+end)
+
+-- Made by siva label
+local credit = Instance.new("TextLabel", loaderFrame)
+credit.Size = UDim2.new(1, 0, 0, 20)
+credit.Position = UDim2.new(0, 0, 1, -20)
+credit.BackgroundTransparency = 1
+credit.Text = "made by siva"
+credit.Font = Enum.Font.FredokaOne
+credit.TextSize = 13
+credit.TextColor3 = Color3.new(1, 1, 1)
+
+-- Minimize functionality
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized
+	btn1.Visible = not isMinimized
+	btn2.Visible = not isMinimized
+	btn3.Visible = not isMinimized
+	btn4.Visible = not isMinimized
+	credit.Visible = not isMinimized
+
+	if isMinimized then
+		loaderFrame.Size = UDim2.new(0, 220, 0, 35)
+		minimizeButton.Text = "+"
+	else
+		loaderFrame.Size = UDim2.new(0, 220, 0, 170)
+		minimizeButton.Text = "-"
+	end
+end)
+
+-- Dragging
+local UserInputService = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	loaderFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+		startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+loaderTitle.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = loaderFrame.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		update(input)
+	end
+end)
